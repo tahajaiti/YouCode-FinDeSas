@@ -18,45 +18,46 @@ typedef struct { //structer for storing reservations information
 Reserv reservations[MAX]; //an array within our structer to store each reservation uniquely
 int count = 10; //how many reservations we have we start by 0
 int id = 11; //starting id
+const char *stvar[4] = {"Valide", "Raporte", "Annule", "Traite"};//variable for status names
 
 void menu() {// main menu
-    printf("\nMenu:\n");
-    printf("1. Ajouter une reservation\n");
-    printf("2. Modifier ou supprimer une reservation\n");
-    printf("3. Afficher les details dune reservation\n");
-    printf("4. Trier les reservations\n");
-    printf("5. Rechercher des reservations\n");
-    printf("6. Afficher les statistiques\n");
-    printf("7. Quitter\n");
+    printf("\n\t\t******Menu******\n");
+    printf("\t1. Ajouter une reservation\n");
+    printf("\t2. Modifier ou supprimer une reservation\n");
+    printf("\t3. Afficher les details dune reservation\n");
+    printf("\t4. Trier les reservations\n");
+    printf("\t5. Rechercher des reservations\n");
+    printf("\t6. Afficher les statistiques\n");
+    printf("\t7. Quitter\n");
 }
 
 void editdelmenu() {//edit or delete menu
-    printf("\nModifier ou Supprimer:\n");
-    printf("1. Modifier une reservation\n");
-    printf("2. Supprimer une reservation\n");
-    printf("3. Retourner\n");
+    printf("\n\t\tModifier ou Supprimer\n");
+    printf("\t1. Modifier une reservation\n");
+    printf("\t2. Supprimer une reservation\n");
+    printf("\t3. Retourner\n");
 }
 
 void searchmenu() {//searching menu
-    printf("\nRecherche:\n");
-    printf("1. Par ID\n");
-    printf("2. Par Nom\n");
-    printf("3. Retourner\n");
+    printf("\n\t\tRecherche\n");
+    printf("\t1. Par ID\n");
+    printf("\t2. Par Nom\n");
+    printf("\t3. Retourner\n");
 }
 
 void sortmenu() {//sorting menu
-    printf("\nTrier par:\n");
-    printf("1. Nom\n");
-    printf("2. Statut\n");
-    printf("3. Retourner\n");
+    printf("\n\t\tTrier par\n");
+    printf("\t1. Nom\n");
+    printf("\t2. Statut\n");
+    printf("\t3. Retourner\n");
 }
 
 void statmenu() {//statistics menu
-    printf("\nMenu des Statistiques:\n");
-    printf("1. Moyenne dage des patients\n");
-    printf("2. Nombre de patients par tranche dage\n");
-    printf("3. Nombre total de reservations par statut\n");
-    printf("4. Quitter\n");
+    printf("\n\t\tMenu des Statistiques\n");
+    printf("\t1. Moyenne dage des patients\n");
+    printf("\t2. Nombre de patients par tranche dage\n");
+    printf("\t3. Nombre total de reservations par statut\n");
+    printf("\t4. Retourner\n");
 }
 
 void fgt(char input[], size_t n) { //function for easier fgets
@@ -128,6 +129,7 @@ int checkstatut(int statut) {//checking status
 
 int checkdate(char date[]) {//checking the date format
     int anne, moi, jour;
+
     if (sscanf(date, "%4d-%2d-%2d", &anne, &moi, &jour) != 3) {//making sure the date is in this format
         printf("Erreur, Entrez une format valide(YYYY-MM-DD)\n"); //YYYY-MM-DD
         return 0;
@@ -199,7 +201,18 @@ void add() {//for adding a reservation
 }
 
 void showres(Reserv res) {//here we declare a reservation variable inside the function to print out reservations
-    printf("\nID: %d|Nom: %s Prenom: %s|Telephone: %s|Age: %d|Satut: %d|Date: %s \n",res.id, res.nom, res.prenom, res.tel, res.age, res.statut,res.date);
+    char statut[10];
+
+    if (res.statut == 1){strcpy(statut, stvar[0]);}
+    if (res.statut == 2){strcpy(statut, stvar[1]);}
+    if (res.statut == 3){strcpy(statut, stvar[2]);}
+    if (res.statut == 4){strcpy(statut, stvar[3]);}
+
+    printf("\n %-2d|Nom|Prenom: %-12s %-9s",res.id, res.nom, res.prenom);
+    printf("|Telephone: %-11s", res.tel);
+    printf("|Age: %-3d", res.age);
+    printf("|Statut: %-7s", statut);
+    printf("|Date: %-15s", res.date);
 }
 
 void showresdetails() {//here we loop through each reservation and show its details
@@ -447,7 +460,6 @@ int main() {
 
     return 0;
 }
-
 
 void def(){
     strcpy(reservations[0].nom, "Jaiti");
