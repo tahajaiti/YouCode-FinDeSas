@@ -17,7 +17,7 @@ typedef struct { //structer for storing reservations information
 
 Reserv reservations[MAX]; //an array within our structer to store each reservation uniquely
 int count = 10; //how many reservations we have we start by 0
-int id = 11; //starting id
+int id = 11; //next unique id to be assigned
 const char *stvar[4] = {"Valide", "Raporte", "Annule", "Traite"};//variable for status names
 
 void menu() {// main menu
@@ -32,55 +32,66 @@ void menu() {// main menu
 }
 
 void editdelmenu() {//edit or delete menu
-    printf("\n\t\tModifier ou Supprimer\n");
+    printf("\n\t\t******Modifier ou Supprimer******\n");
     printf("\t1. Modifier une reservation\n");
     printf("\t2. Supprimer une reservation\n");
     printf("\t3. Retourner\n");
 }
 
 void searchmenu() {//searching menu
-    printf("\n\t\tRecherche\n");
+    printf("\n\t\t******Recherche******\n");
     printf("\t1. Par ID\n");
     printf("\t2. Par Nom\n");
     printf("\t3. Retourner\n");
 }
 
 void sortmenu() {//sorting menu
-    printf("\n\t\tTrier par\n");
-    printf("\t1. Nom\n");
-    printf("\t2. Statut\n");
+    printf("\n\t\t******Trier******\n");
+    printf("\t1. Par Nom\n");
+    printf("\t2. Par Statut\n");
     printf("\t3. Retourner\n");
 }
 
 void statmenu() {//statistics menu
-    printf("\n\t\tMenu des Statistiques\n");
+    printf("\n\t\t******Menu des Statistiques******\n");
     printf("\t1. Moyenne dage des patients\n");
     printf("\t2. Nombre de patients par tranche dage\n");
     printf("\t3. Nombre total de reservations par statut\n");
     printf("\t4. Retourner\n");
 }
 
+void confirmmenu(int n){
+    if (n == 1){
+        printf("\nEtes-vous ssr de vouloir modifier?");// propmting the user if he is sure to edit said reservation
+        printf("\n1. Confirmer");
+        printf("\n2. Retourner");}
+    else if (n == 2){
+        printf("\nEtes-vous ssr de vouloir supprimer?");
+        printf("\n1. Confirmer");
+        printf("\n2. Retourner");}
+}
+
 void fgt(char input[], size_t n) { //function for easier fgets
-    fgets(input, n, stdin);
-    input[strcspn(input, "\n")] = 0; //remove \n
+    fgets(input, n, stdin);//we use fget to accept whitespaces and not \n
+    input[strcspn(input, "\n")] = 0; //remove \n at the end
 }
 
 int getchoice(int min, int max) {//function to get the user choice because we have nested menu
     int choice;
     while (1) {
-        printf("Entrez votre choix (%d-%d): ", min, max);
-        if (scanf("%d", &choice) == 1 && choice >= min && choice <= max) { //checking the correct choice
-            getchar(); // clearing new line
+        printf("\nEntrez votre choix (%d-%d): ", min, max);//checking the correct choice
+        if (scanf("%d", &choice) == 1 && choice >= min && choice <= max) {
+            getchar(); // clearing new line and getting only the first digit
             return choice;
         } else {
-            printf("Erreur, entrez un nombre valide.\n");
+            printf("Erreur, Entrez un choix valide.\n");
             while (getchar() != '\n'); //clearing the input
         }
     }
 }
 
 int checkage(int age) { //checking the age
-    if (age > 0 && age < 90) {
+    if (age > 0 && age < 100) {// le min age est 1 et le max est 99
         return 1;
     } else {
         printf("Erreur, Entrez un age valide\n");
@@ -90,7 +101,7 @@ int checkage(int age) { //checking the age
 
 int checkname(char *nom) { //checking the name
     for (int i = 0; nom[i] != '\0'; i++) {
-        if (!isalpha(nom[i]) && isspace(nom[i])) { //making sure the name doesnt contain numbers
+        if (!isalpha(nom[i]) && !isspace(nom[i])) { //making sure the name doesnt contain numbers with spaces
             printf("Erreur, Entrer un nom valide.\n");
             return 0;
         }
@@ -101,7 +112,7 @@ int checkname(char *nom) { //checking the name
 int checknum(char *num, int idx) { //checking the numbers
     for (int i = 0; i < count; i++) {
         if (i != idx && strcmp(reservations[i].tel, num) == 0) { //making sure that the number dont already exists
-            printf("Erreur, ce numero existe deja\n");
+            printf("Erreur, Ce numero existe deja\n");
             return 0;
         }  
     }
@@ -112,7 +123,7 @@ int checknum(char *num, int idx) { //checking the numbers
     }
 
     if (strncmp(num, "06", 2) != 0 && strncmp(num, "07", 2) != 0) {//making sure the number starts with 06 or 07
-        printf("Erreur, le numero doit commencer par 06 ou 07\n");
+        printf("Erreur, Le numero doit commencer par 06 ou 07\n");
         return 0;
     }
 
@@ -123,7 +134,7 @@ int checkstatut(int statut) {//checking status
     if (statut >= 1 && statut <= 4){
         return 1;}
     else
-        printf("Erreur, Entrez une status valide");
+        printf("Erreur, Entrez une status valide(1.Valide, 2.Raporte, 3.Annule, 4.Traite).");
         return 0;
 }
 
@@ -134,16 +145,16 @@ int checkdate(char date[]) {//checking the date format
         printf("Erreur, Entrez une format valide(YYYY-MM-DD)\n"); //YYYY-MM-DD
         return 0; //sscanf returns 4 is something is not valid then we return error
     } else if (mmonth < 1 || mmonth > 12 || day < 1 || day > 31) {//checking the number of days and months is correct
-        printf("Erreur, Entrez jour ou mois valide\n");
+        printf("Erreur, Entrez un jour ou un mois valide\n");
         return 0;
     } else if (year < 1950 || year > 2050){//same thing as above making sure the year enetered is valid
-        printf("Erreur, Entrez annee valide\n");
+        printf("Erreur, Entrez une annee valide\n");
         return 0;
     } else if (mmonth == 2 && day > 28) { //same thing for this one but this is for february 
-        printf("Erreur, Entrez jour valide\n");//because it has 28 days
+        printf("Erreur, Entrez un jour valide\n");//because it has 28 days
         return 0;
     } else if ((mmonth == 4 || mmonth == 6 || mmonth == 9 || mmonth == 11) && day > 30) {
-        printf("Erreur, Entrez jour valide\n");//and this is for months that only have 30 days
+        printf("Erreur, Entrez un jour valide\n");//and this is for months that only have 30 days
         return 0;
     }
 
@@ -206,19 +217,19 @@ void showres(Reserv res) {//here we declare a reservation variable inside the fu
     if (res.statut == 2){strcpy(statut, stvar[1]);}
     if (res.statut == 3){strcpy(statut, stvar[2]);}
     if (res.statut == 4){strcpy(statut, stvar[3]);}
-
-    printf("\n %-2d|Nom|Prenom: %-12s %-9s",res.id, res.nom, res.prenom);
+    printf("\n+---+---+------------------------------+----------------------+--------+---------------+-----------------+");
+    printf("\n| %-3d|Nom|Prenom: %-12s %-9s",res.id, res.nom, res.prenom);
     printf("|Telephone: %-11s", res.tel);
     printf("|Age: %-3d", res.age);
     printf("|Statut: %-7s", statut);
-    printf("|Date: %-15s", res.date);
+    printf("|Date: %-11s|", res.date);
 }
 
 void showresdetails() {//here we loop through each reservation and show its details
-    /*char search[10];
+    char search[10];
     printf("Entrez lID de la reservation: ");
     fgt(search, sizeof(search));
-    int inputsearch = atoi(search);*/
+    int inputsearch = atoi(search);
     //the code above is if we want to display a reservation with its unique id
 
     if (count == 0){
@@ -226,13 +237,14 @@ void showresdetails() {//here we loop through each reservation and show its deta
     }
 
     for (int i = 0; i < count; i++) { //the loop for doing this
-        //if (reservations[i].id == inputsearch) {
+        if (reservations[i].id == inputsearch) {
             showres(reservations[i]);
+            return;
         }
     
-    //}
-    //printf("Aucune reservation trouvee avec cette ID.\n");
-    return;
+    }
+    printf("Aucune reservation trouvee avec cette ID.\n");
+    
 }
 
 void edit() {//function to edit a reservation with id
@@ -240,46 +252,55 @@ void edit() {//function to edit a reservation with id
     printf("Entrez lID de la reservation: ");
     fgt(search, sizeof(search));
     int inputsearch = atoi(search);//convert to int
-
+    int choice;
     for (int i = 0; i < count; i++) { //search loop to find said reservation with id
         if (reservations[i].id == inputsearch) {// if
-            printf("Modifier la reservation %d:\n", reservations[i].id);
-            do {
-                printf("Nom: ");
-                fgt(reservations[i].nom, sizeof(reservations[i].nom));
-            } while (!checkname(reservations[i].nom));
+            printf("\nUne reservation avec cet ID a ete trouvee");
+            showres(reservations[i]);//displaying said id if its found
+            confirmmenu(1);//to show the confirmation menu
+            choice = getchoice(1,2);//taking the choice
+            printf("\nModifier la reservation %d:", reservations[i].id);
+            if (choice = 1){ //here the user gets to edit the reservation
+                do {
+                    printf("\nNom: ");
+                    fgt(reservations[i].nom, sizeof(reservations[i].nom));
+                } while (!checkname(reservations[i].nom));
 
-            do {
-                printf("Prenom: ");
-                fgt(reservations[i].prenom, sizeof(reservations[i].prenom));
-            } while (!checkname(reservations[i].prenom));
+                do {
+                    printf("\nPrenom: ");
+                    fgt(reservations[i].prenom, sizeof(reservations[i].prenom));
+                } while (!checkname(reservations[i].prenom));
 
-            do {
-                printf("Telephone: ");
-                fgt(reservations[i].tel, sizeof(reservations[i].tel));
-            } while (!checknum(reservations[i].tel, count));
+                do {
+                    printf("\nTelephone: ");
+                    fgt(reservations[i].tel, sizeof(reservations[i].tel));
+                } while (!checknum(reservations[i].tel, reservations[i].id-1));
 
-            char inputage[10];
-            do {
-                printf("Age: ");
-                fgt(inputage, sizeof(inputage));
-                reservations[i].age = atoi(inputage);
-            } while (!checkage(reservations[i].age));
+                char inputage[10];
+                do {
+                    printf("\nAge: ");
+                    fgt(inputage, sizeof(inputage));
+                    reservations[i].age = atoi(inputage);
+                } while (!checkage(reservations[i].age));
 
-            char inputstatut[10];
-            do {
-                printf("Statut: ");
-                fgt(inputstatut, sizeof(inputstatut));
-                reservations[i].statut = atoi(inputstatut);
-            } while (!checkstatut(reservations[i].statut));
+                char inputstatut[10];
+                do {
+                    printf("\nStatut(1.Valide, 2.Raporte, 3.Annule, 4.Traite): ");
+                    fgt(inputstatut, sizeof(inputstatut));
+                    reservations[i].statut = atoi(inputstatut);
+                } while (!checkstatut(reservations[i].statut));
 
-            do {
-                printf("Date de reservation: ");
-                fgt(reservations[i].date, sizeof(reservations[i].date));
-            } while (!checkdate(reservations[i].date));
+                do {
+                    printf("\nDate de reservation: ");
+                    fgt(reservations[i].date, sizeof(reservations[i].date));
+                } while (!checkdate(reservations[i].date));
 
-            printf("Reservation mise a jour avec succes!\n");
-            return;
+                printf("Reservation mise a jour avec succes!\n");
+                return;
+            }
+            else if (choice = 2){//he if the user choses to return we simply return
+                return;
+            }
         }
     }
     printf("Aucune reservation trouvee avec cette ID.\n");//else we print there are no reservatiosn with this id
@@ -290,15 +311,26 @@ void delete() {//function to delete a reservation with id
     printf("Entrez lID de la reservation: ");
     fgt(search, sizeof(search));
     int inputsearch = atoi(search);
+    int choice;
 
     for (int i = 0; i < count; i++) {//loop through each reservation to find the correct one
         if (reservations[i].id == inputsearch) {//if found
-            for (int j = i; j < count - 1; j++) {//then we start moving each reservation to the left
-                reservations[j] = reservations[j + 1];//
+            printf("\nUne reservation avec cet ID a ete trouvee");
+            showres(reservations[i]);
+            confirmmenu(2);//to get confirmation from the user
+            choice = getchoice(1,2);
+            if (choice == 1){
+                for (int j = i; j < count - 1; j++) {//then we start moving each reservation to the left
+                    reservations[j] = reservations[j + 1];
+                }
+                count--;//we decrement the count because we deleted something
+                printf("Reservation supprimee avec succes!\n");//once the inside loop is done we print
+                return;//then return
             }
-            count--;//we decrement the count because we deleted something
-            printf("Reservation supprimee avec succes!\n");//once the inside loop is done we print
-            return;//then return
+            else if (choice == 2){
+                return;
+            }
+            
         }
     }
     printf("Aucune reservation trouvee avec cette ID.\n");//else we print there are no reservations with the id
@@ -316,6 +348,12 @@ void sortwithanme() { //sorting with name using bubble sort
         }
     }
     printf("Reservations triees par nom.\n");//print success
+
+    for (int i = 0; i < count; i++) { //the loop for doing this
+            showres(reservations[i]);
+    }
+    return;
+
 }
 
 void sortwithstatus() {//sorting with status
@@ -329,6 +367,12 @@ void sortwithstatus() {//sorting with status
         }
     }
     printf("Reservations triees par statut.\n");//print success
+
+    for (int i = 0; i < count; i++) { //the loop for doing this
+            showres(reservations[i]);
+    }
+    return;
+
 }
 
 void searchwithid() {//searching with id
@@ -374,7 +418,7 @@ void calculmoyenne() {//calculating average
         total += reservations[i].age;
     }
 
-    printf("Moyenne dage: %.2f\n", total / count);
+    printf("Moyenne dage est: %.2f\n", total / count);
 }
 
 void countages() {//counting ages
@@ -393,9 +437,9 @@ void countages() {//counting ages
     }
 
     printf("Nombre de patients par tranche dage:\n"); //here we print everything
-    printf("0-18: %d\n", group[0]);
-    printf("19-35: %d\n", group[1]);
-    printf("36+: %d\n", group[2]);
+    printf("de 0 a 18 ans: %d\n", group[0]);
+    printf("de 19 a 35 ans: %d\n", group[1]);
+    printf("de 36+: %d\n", group[2]);
 }
 
 void countbystatus() {//counting by status
@@ -430,7 +474,7 @@ int main() {
     do {//a loop that only breaks when the user inputs 7(quitter)
         menu();//displaying main menu
         
-        choice = getchoice(1, 7);//getting the choice from the user
+        choice = getchoice(1,7);//getting the choice from the user
 
         switch (choice) {//switch case so the user can choose
             case 1: add(); break; //adding
@@ -461,74 +505,54 @@ int main() {
 }
 
 void def(){
-    strcpy(reservations[0].nom, "Jaiti");
-    strcpy(reservations[0].prenom, "Taha");
-    strcpy(reservations[0].tel, "0682226573");
+    strcpy(reservations[0].nom, "Jaiti");reservations[0].age = 21;
+    strcpy(reservations[0].prenom, "Taha");reservations[0].statut = 4;
+    strcpy(reservations[0].tel, "0682226573");reservations[0].id = 1;
     strcpy(reservations[0].date, "2004-08-16");
-    reservations[0].age = 21;
-    reservations[0].statut = 4;
-    reservations[0].id = 1;
-    strcpy(reservations[1].nom, "Katkot");
-    strcpy(reservations[1].prenom, "Ghali");
-    strcpy(reservations[1].tel, "0683276982");
+
+    strcpy(reservations[1].nom, "Katkot");reservations[1].age = 1;
+    strcpy(reservations[1].prenom, "Ghali");reservations[1].statut = 4;
+    strcpy(reservations[1].tel, "0683276982");reservations[1].id = 2;
     strcpy(reservations[1].date, "2023-12-03");
-    reservations[1].age = 1;
-    reservations[1].statut = 4;
-    reservations[1].id = 2;
-    strcpy(reservations[2].nom, "Sarfok");
-    strcpy(reservations[2].prenom, "Youness");
-    strcpy(reservations[2].tel, "0713654834");
+
+    strcpy(reservations[2].nom, "Serghini");reservations[2].age = 15;
+    strcpy(reservations[2].prenom, "Jad");reservations[2].statut = 2;
+    strcpy(reservations[2].tel, "0713654834");reservations[2].id = 3;
     strcpy(reservations[2].date, "2016-06-12");
-    reservations[2].age = 15;
-    reservations[2].statut = 2;
-    reservations[2].id = 3;
-    strcpy(reservations[3].nom, "EL Ouariachi");
-    strcpy(reservations[3].prenom, "Yasser");
-    strcpy(reservations[3].tel, "0689342544");
+
+    strcpy(reservations[3].nom, "EL Ouariachi");reservations[3].age = 20;
+    strcpy(reservations[3].prenom, "Yasser");reservations[3].statut = 1;
+    strcpy(reservations[3].tel, "0689342544");reservations[3].id = 4;
     strcpy(reservations[3].date, "2005-06-12");
-    reservations[3].age = 20;
-    reservations[3].statut = 1;
-    reservations[3].id = 4;
-    strcpy(reservations[4].nom, "Ziza");
-    strcpy(reservations[4].prenom, "Mohammed");
-    strcpy(reservations[4].tel, "0623071034");
-    strcpy(reservations[4].date, "2023-06-12");
-    reservations[4].age = 40;
-    reservations[4].statut = 3;
-    reservations[4].id = 5;
-    strcpy(reservations[5].nom, "Lkhbizi");
-    strcpy(reservations[5].prenom, "Imane");
-    strcpy(reservations[5].tel, "0733688450");
-    strcpy(reservations[5].date, "2024-02-28");
-    reservations[5].age = 37;
-    reservations[5].statut = 2;
-    reservations[5].id = 6;
-    strcpy(reservations[6].nom, "Astir");
-    strcpy(reservations[6].prenom, "Nabil");
-    strcpy(reservations[6].tel, "0698497658");
+  
+    strcpy(reservations[4].nom, "Ziza");reservations[4].age = 40;
+    strcpy(reservations[4].prenom, "Mohammed");reservations[4].statut = 3;
+    strcpy(reservations[4].tel, "0623071034");reservations[4].id = 5;
+    strcpy(reservations[4].date, "2023-08-04");
+
+    strcpy(reservations[5].nom, "Lkhbizi");reservations[5].age = 37;
+    strcpy(reservations[5].prenom, "Imane");reservations[5].statut = 2;
+    strcpy(reservations[5].tel, "0733688450");reservations[5].id = 6;
+    strcpy(reservations[5].date, "2024-05-28");
+
+    strcpy(reservations[6].nom, "Astir");reservations[6].age = 5;
+    strcpy(reservations[6].prenom, "Nabil");reservations[6].statut = 1;
+    strcpy(reservations[6].tel, "0698497658");reservations[6].id = 7;
     strcpy(reservations[6].date, "2024-08-30");
-    reservations[6].age = 5;
-    reservations[6].statut = 1;
-    reservations[6].id = 7;
-    strcpy(reservations[7].nom, "Potchi");
-    strcpy(reservations[7].prenom, "Kawter");
-    strcpy(reservations[7].tel, "0612563544");
+  
+    strcpy(reservations[7].nom, "Benanaa");reservations[7].age = 18;
+    strcpy(reservations[7].prenom, "Saad");reservations[7].statut = 3;
+    strcpy(reservations[7].tel, "0612563544");reservations[7].id = 8;
     strcpy(reservations[7].date, "2024-09-23");
-    reservations[7].age = 18;
-    reservations[7].statut = 3;
-    reservations[7].id = 8;
-    strcpy(reservations[8].nom, "Nigor");
-    strcpy(reservations[8].prenom, "Ilyass");
-    strcpy(reservations[8].tel, "0642066420");
+ 
+    strcpy(reservations[8].nom, "Nigor");reservations[8].age = 27;
+    strcpy(reservations[8].prenom, "Ilyass");reservations[8].statut = 4;
+    strcpy(reservations[8].tel, "0642066420");reservations[8].id = 9;
     strcpy(reservations[8].date, "2017-11-21");
-    reservations[8].age = 27;
-    reservations[8].statut = 4;
-    reservations[8].id = 9;
-    strcpy(reservations[9].nom, "Lefkih");
-    strcpy(reservations[9].prenom, "Saad");
-    strcpy(reservations[9].tel, "0742042066");
+ 
+    strcpy(reservations[9].nom, "Lefkih");reservations[9].age = 25;
+    strcpy(reservations[9].prenom, "Saad");reservations[9].statut = 3;
+    strcpy(reservations[9].tel, "0742042066");reservations[9].id = 10;
     strcpy(reservations[9].date, "2021-03-24");
-    reservations[9].age = 25;
-    reservations[9].statut = 3;
-    reservations[9].id = 10;
+ 
 }
