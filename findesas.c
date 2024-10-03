@@ -128,23 +128,22 @@ int checkstatut(int statut) {//checking status
 }
 
 int checkdate(char date[]) {//checking the date format
-    int anne, moi, jour;
+    int year, mmonth, day;
 
-    if (sscanf(date, "%4d-%2d-%2d", &anne, &moi, &jour) != 3) {//making sure the date is in this format
+    if (sscanf(date, "%d-%d-%d", &year, &mmonth, &day) != 3) {//checking the date format is valid
         printf("Erreur, Entrez une format valide(YYYY-MM-DD)\n"); //YYYY-MM-DD
-        return 0;
-    }
-
-    if (moi < 1 || moi > 12 || jour < 1 || jour > 31) {//making sure the number of days and months is correct
+        return 0; //sscanf returns 4 is something is not valid then we return error
+    } else if (mmonth < 1 || mmonth > 12 || day < 1 || day > 31) {//checking the number of days and months is correct
         printf("Erreur, Entrez jour ou mois valide\n");
         return 0;
-    }
-
-    if (moi == 2 && jour > 28) { //same thing for this one but this is for february 
+    } else if (year < 1950 || year > 2050){//same thing as above making sure the year enetered is valid
+        printf("Erreur, Entrez annee valide\n");
+        return 0;
+    } else if (mmonth == 2 && day > 28) { //same thing for this one but this is for february 
         printf("Erreur, Entrez jour valide\n");//because it has 28 days
         return 0;
-    } else if ((moi == 4 || moi == 6 || moi == 9 || moi == 11) && jour > 30) {//and this is for months that
-        printf("Erreur, Entrez jour valide\n");                              // only have 30 days
+    } else if ((mmonth == 4 || mmonth == 6 || mmonth == 9 || mmonth == 11) && day > 30) {
+        printf("Erreur, Entrez jour valide\n");//and this is for months that only have 30 days
         return 0;
     }
 
@@ -240,10 +239,10 @@ void edit() {//function to edit a reservation with id
     char search[10]; //because of fgets we use a char then convert it to an int
     printf("Entrez lID de la reservation: ");
     fgt(search, sizeof(search));
-    int idSearch = atoi(search);
+    int inputsearch = atoi(search);//convert to int
 
     for (int i = 0; i < count; i++) { //search loop to find said reservation with id
-        if (reservations[i].id == idSearch) {
+        if (reservations[i].id == inputsearch) {// if
             printf("Modifier la reservation %d:\n", reservations[i].id);
             do {
                 printf("Nom: ");
@@ -290,14 +289,14 @@ void delete() {//function to delete a reservation with id
     char search[10];//same thing we did with edit function
     printf("Entrez lID de la reservation: ");
     fgt(search, sizeof(search));
-    int idSearch = atoi(search);
+    int inputsearch = atoi(search);
 
     for (int i = 0; i < count; i++) {//loop through each reservation to find the correct one
-        if (reservations[i].id == idSearch) {//if found
+        if (reservations[i].id == inputsearch) {//if found
             for (int j = i; j < count - 1; j++) {//then we start moving each reservation to the left
                 reservations[j] = reservations[j + 1];//
             }
-            count--;
+            count--;//we decrement the count because we deleted something
             printf("Reservation supprimee avec succes!\n");//once the inside loop is done we print
             return;//then return
         }
