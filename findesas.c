@@ -16,9 +16,8 @@ typedef struct { //structer for storing reservations information
 } Reserv;
 
 Reserv reservations[MAX]; //an array within our structer to store each reservation uniquely
-int count = 0; //how many reservations we have we start by 0
+int count = 10; //how many reservations we have we start by 0
 int id = 11; //next unique id to be assigned
-const char *stvar[4] = {"Valide", "Raporte", "Annule", "Traite"};//variable for status names
 
 void menu() {// main menu
     printf("\n\t\t******Menu******\n");
@@ -225,6 +224,7 @@ void add() {//for adding a reservation
 
 void showres(Reserv res) {//here we declare a reservation variable inside the function to print out reservations
     char statut[10];
+    char *stvar[4] = {"Valide", "Raporte", "Annule", "Traite"};//variable for status names
 
     if (res.statut == 1){strcpy(statut, stvar[0]);}
     if (res.statut == 2){strcpy(statut, stvar[1]);}
@@ -252,7 +252,8 @@ void showresdetails() {//here we loop through each reservation and show its deta
         }
         return;
     } else if (choice == 2){
-        searchwithid();
+        int found = searchwithid();
+        if (found == 0) printf("Aucune reservation trouvee avec cette ID.\n");
         return;
     } else if (choice == 3){
         return;
@@ -261,52 +262,48 @@ void showresdetails() {//here we loop through each reservation and show its deta
     
 }
 
-void edit() {//function to edit a reservation with id
-    if (count == 0){
+void edit() { // function to edit a reservation with id
+    if (count == 0) {
         printf("il ny a pas de reservations.\n");
         return;
     }
     int index = searchwithid(); // finding the index
 
-    if (index != 0) { // check if a reservation was found
-        printf("\nModifier la reservation %d:", reservations[index].id);
-        confirmmenu(1);//to show the confirmation menu
-        int choice = getchoice(1,2);//taking the choice
-        if (choice == 1){ //here the user gets to edit the reservation
-            getreservation(&reservations[index], reservations[index].id-1);
-            printf("Reservation mise a jour avec succes!\n");
-        }
-        else if (choice == 2){//if the user chooses to return we simply return
-            return;
-        }
-    } else {
-        printf("Aucune reservation trouvee avec cette ID.\n");//else we print there are no reservations with this id
+    if (index == -1) { //check if no reservation was found
+        return; // exit the function if not found
+    }
+
+    printf("\nModifier la reservation %d:", reservations[index].id);
+    confirmmenu(1); // to show the confirmation menu
+    int choice = getchoice(1, 2); // taking the choice
+    if (choice == 1) { // here the user gets to edit the reservation
+        getreservation(&reservations[index], index);
+        printf("Reservation mise a jour avec succes!\n");
     }
 }
 
-void delete() {//function to delete a reservation with id
-    if (count == 0){
+void delete() { // function to delete a reservation with id
+    if (count == 0) {
         printf("il ny a pas de reservations.\n");
         return;
     }
     int index = searchwithid(); // finding the index
 
-    if (index != 0) { // check if a reservation was found
-        printf("\nUne reservation avec cet ID a ete trouvee!");
-        confirmmenu(2);//to get confirmation from the user
-        int choice = getchoice(1,2);
-        if (choice == 1) {
-            for (int j = index; j < count - 1; j++) {//then we start moving each reservation to the left
-                reservations[j] = reservations[j + 1];
-            }
-            count--;//we decrement the count because we deleted something
-            printf("Reservation supprimee avec succes!\n");//once the inside loop is done we print
-        } 
-        else if (choice == 2) {
-            return;
+    if (index == -1) { //checking if the index is found
+        return; // exit the function if not found
+    }
+
+    printf("\nUne reservation avec cet ID a ete trouvee!");
+    confirmmenu(2); // to get confirmation from the user
+    int choice = getchoice(1, 2);
+    if (choice == 1) {
+        for (int j = index; j < count - 1; j++) { //move everything to the left
+            reservations[j] = reservations[j + 1];
         }
-    } else {
-        printf("Aucune reservation trouvee avec cette ID.\n");//else we print there are no reservations with the id
+        count--; // decrement the count because we deleted something
+        printf("Reservation supprimee avec succes!\n"); // once the inside loop is done we print
+    } else if (choice == 2) {
+        return; // do nothing if user chooses to return
     }
 }
 
@@ -362,19 +359,21 @@ int searchwithid() {//searching with id and returning the index
         printf("il ny a pas de reservations.\n");
         return 0;
     }
+
     char search[10];
     printf("Entrez lID de la reservation: ");
     fgt(search, sizeof(search));
-    int idSearch = atoi(search);
+    int inputid = atoi(search);
 
     for (int i = 0; i < count; i++) {//searching with linear search
-        if (reservations[i].id == idSearch) {
+        if (reservations[i].id == inputid) {
             showres(reservations[i]);//here we call the displaying function we established earlier
             return i; // return the index of the found reservation
         }
     }
+
     printf("Aucune reservation trouvee avec cette ID.\n");//print false
-    return 0; // return -1 if not found
+    return -1; // return -1 if not found
 }
 
 void searchwithname() {//searching with name
